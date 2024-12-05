@@ -47,10 +47,10 @@ app.use("/api/v1/orders", orderRouter);
 app.use(notFound);
 app.use(errorHandlerMiddleware);
 
-let PORT = process.env.PORT || 5000;
+const port = process.env.PORT || 4000;
 const start = async () => {
   try {
-    app.listen(PORT, () => console.log(`Server is Listing on PORT ${PORT}`));
+    app.listen(port, () => console.log(`Server is Listing on PORT ${port}`));
   } catch (error) {
     console.error(error);
   }
