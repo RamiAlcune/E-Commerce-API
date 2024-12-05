@@ -38,6 +38,10 @@ app.use((0, express_rate_limit_1.default)({
     windowMs: 15 * 60 * 1000,
     max: 60,
 }));
+//TEST
+app.get("/", (req, res) => {
+    res.status(200).send("API is running on Render!");
+});
 //Routes
 app.use("/api/v1/auth", authRoutes_1.default);
 app.use("/api/v1/users", usersRoute_1.default);
