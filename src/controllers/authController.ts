@@ -4,6 +4,7 @@ import { Request, Response, NextFunction, response } from "express";
 import { getUserByUserName, createUser, UserInput } from "../models/UsersModel";
 import { attachCookiesResponse } from "../utils/jwt";
 import { createTokenUser } from "../utils/createTokenUser";
+import { token } from "morgan";
 export const register = async (req: Request, res: Response): Promise<void> => {
   const { username, password, email } = req.body;
   if (!username || !password || !email) {
@@ -18,13 +19,14 @@ export const register = async (req: Request, res: Response): Promise<void> => {
 
   const hashedPassowrd = await bcrypt.hash(password, 10);
 
-  const userCreated = await createUser({ username, email, password: hashedPassowrd });
+  const verifcationToken = "fake token";
 
-  if (!userCreated.role) userCreated.role = "user";
-  const TokenUser = createTokenUser(userCreated);
-  // const token = await generateToken({ userId: userCreated.id, user: userCreated.user });
-  await attachCookiesResponse({ res, user: userCreated.username });
-  res.status(200).json({ msg: "Registration Successful!", data: TokenUser, status: true });
+  const userCreated = await createUser({ username, email, password: hashedPassowrd, verifcationToken });
+
+  //send verif
+  res
+    .status(201)
+    .json({ msg: "Success! Please Check Your Email to verify the account.", verifcationToken: userCreated?.verifcationToken, status: true });
 };
 
 export const login = async (req: Request, res: Response): Promise<void> => {
@@ -43,9 +45,11 @@ export const login = async (req: Request, res: Response): Promise<void> => {
   const isPasswordValid = await bcrypt.compare(userInfo.password, userExist.password);
 
   if (!isPasswordValid) {
-    res
-      .status(StatusCodes.NOT_FOUND)
-      .json({ msg: "The password you entered is incorrect. Please verify and try again.", status: false });
+    res.status(StatusCodes.NOT_FOUND).json({ msg: "The password you entered is incorrect. Please verify and try again.", status: false });
+  }
+  if (!userExist.isVerified) {
+    res.status(401).json({ msg: "Please Verify The account before trying to login.", status: false });
+    return;
   }
   // const token = await generateToken(userInfo.user);
   const UserReq = createTokenUser(userExist);

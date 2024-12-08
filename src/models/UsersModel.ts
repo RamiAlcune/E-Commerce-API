@@ -9,6 +9,7 @@ export interface UserI extends RowDataPacket {
   password: string;
   id: number;
   role: string;
+  isVerified?: boolean;
 }
 
 export interface ReqUserI {
@@ -23,6 +24,9 @@ export interface UserReqI {
   password: string;
   id: number;
   role?: string;
+  verifcationToken?: string;
+  isVerified?: boolean;
+  verified?: Date;
 }
 
 export interface UserFindAndUpdate {
@@ -39,22 +43,29 @@ export interface UserInput {
   username: string;
   email: string;
   password: string;
+  verifcationToken?: string;
 }
 export const getUserByUserName = async (username: string): Promise<UserI | null> => {
   const [rows] = await connection.query<UserI[]>("SELECT * FROM users WHERE username = ?", [username]);
   return rows[0] || null;
 };
 
-export const createUser = async (user: UserInput): Promise<UserReqI> => {
+export const createUser = async (user: UserInput): Promise<UserReqI | null> => {
   if (!validator.isEmail(user.email)) {
     throw new Error("Invalid email format");
   }
-  const [result] = (await connection.query("INSERT INTO users (username,password,email) VALUES (?,?,?)", [
+  const [result] = (await connection.query("INSERT INTO users (username,password,email,verifcationToken) VALUES (?,?,?,?)", [
     user.username,
     user.password,
     user.email,
+    user.verifcationToken,
   ])) as ResultSetHeader[];
-  return { id: result.insertId, ...user };
+
+  const [rows] = (await connection.query("SELECT * FROM users WHERE id = ?", [result.insertId])) as RowDataPacket[];
+  if (rows.length > 0) {
+    return rows[0] as UserReqI;
+  }
+  return null;
 };
 
 export const getUsers = async () => {
