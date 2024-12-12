@@ -12,12 +12,12 @@ import { createToken, TokenI } from "../models/tokenModel";
 export const register = async (req: Request, res: Response): Promise<void> => {
   const { username, password, email } = req.body;
   if (!username || !password || !email) {
-    res.status(StatusCodes.BAD_REQUEST).json({ msg: "All fields are required.", status: false });
+    res.status(200).json({ msg: "All fields are required.", status: false });
     return;
   }
   const userExist = await getUserByUserName(username);
   if (userExist) {
-    res.status(StatusCodes.BAD_REQUEST).json({ msg: "This account has already been registered.", status: false });
+    res.status(200).json({ msg: "This account has already been registered.", status: false });
     return;
   }
 
@@ -36,29 +36,29 @@ export const register = async (req: Request, res: Response): Promise<void> => {
   };
   await sendVerifactionEmail(Data);
   //send verif
-  res.status(201).json({ msg: "Success! Please Check Your Email to verify the account.", status: true });
+  res.status(200).json({ msg: "Success! Please Check Your Email to verify the account.", status: true });
 };
 
 export const login = async (req: Request, res: Response): Promise<void> => {
   const userInfo = req.body;
   if (!userInfo.username || !userInfo.password || !userInfo.email) {
-    res.status(StatusCodes.BAD_REQUEST).json({ msg: "All fields are required.", status: false });
+    res.status(200).json({ msg: "All fields are required.", status: false });
     return;
   }
 
   const userExist = await getUserByUserName(userInfo.username);
   if (!userExist) {
-    res.status(StatusCodes.BAD_REQUEST).json({ msg: "This account is not registered.", status: false });
+    res.status(200).json({ msg: "This account is not registered.", status: false });
     return;
   }
 
   const isPasswordValid = await bcrypt.compare(userInfo.password, userExist.password);
 
   if (!isPasswordValid) {
-    res.status(StatusCodes.NOT_FOUND).json({ msg: "The password you entered is incorrect. Please verify and try again.", status: false });
+    res.status(200).json({ msg: "The password you entered is incorrect. Please verify and try again.", status: false });
   }
   if (!userExist.isVerified) {
-    res.status(401).json({ msg: "Please Verify The account before trying to login.", status: false });
+    res.status(200).json({ msg: "Please Verify The account before trying to login.", status: false });
     return;
   }
   const UserReq = createTokenUser(userExist);
@@ -72,7 +72,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
   const userToken: TokenI = { refresh_token, ip, user_agent, id_user: userExist.id };
   const token = await createToken(userToken);
   // await attachCookiesResponse({ res, user: UserReq });
-  res.status(201).json({ userToken: userToken, token: token });
+  res.status(200).json({ userToken: userToken, token: token });
 };
 
 export const logout = async (req: Request, res: Response): Promise<void> => {
@@ -103,10 +103,10 @@ export const verifyEmail = async (req: Request, res: Response) => {
   } catch (error) {
     if (error instanceof Error) {
       // Handle known error types
-      res.status(400).json({ msg: error.message, status: false });
+      res.status(200).json({ msg: error.message, status: false });
     } else {
       // Handle unknown error types
-      res.status(500).json({ msg: "An unknown error occurred", status: false });
+      res.status(200).json({ msg: "An unknown error occurred", status: false });
     }
   }
 };
