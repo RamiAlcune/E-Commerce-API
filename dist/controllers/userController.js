@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateUserPassword = exports.updateUser = exports.showCurrentUser = exports.getUserByID = exports.getAllUsers = void 0;
+exports.updateUserPassword = exports.updateUser = exports.showCurrentUser = exports.getUserByEmail = exports.getUserByID = exports.getAllUsers = void 0;
 const http_status_codes_1 = require("http-status-codes");
 const UsersModel_1 = require("../models/UsersModel");
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
@@ -28,6 +28,15 @@ const getUserByID = async (req, res) => {
     res.status(200).json({ data: user, status: true });
 };
 exports.getUserByID = getUserByID;
+const getUserByEmail = async (req, res) => {
+    const { email } = req.params;
+    const user = await (0, UsersModel_1.getSingleUserByEmail)(email);
+    if (!user || !email)
+        res.status(404).json({ msg: "User is not found", status: false });
+    (0, checkPermissions_1.checkPermissions)(req.user, user.id);
+    res.status(200).json({ data: user, status: true });
+};
+exports.getUserByEmail = getUserByEmail;
 const showCurrentUser = async (req, res) => {
     console.log(req.user);
     res.status(http_status_codes_1.StatusCodes.OK).json({ user: req.user });

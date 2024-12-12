@@ -1,5 +1,5 @@
 import { StatusCodes } from "http-status-codes";
-import { getUsers, getSingleUserByID, UpdateUserByID, changeCurrentPassword } from "../models/UsersModel";
+import { getUsers, getSingleUserByID, UpdateUserByID, changeCurrentPassword, getSingleUserByEmail } from "../models/UsersModel";
 import { Request, Response } from "express";
 import bcrypt from "bcryptjs";
 import { error } from "console";
@@ -19,6 +19,14 @@ export const getUserByID = async (req: Request, res: Response) => {
   const { id } = req.params;
   const user = await getSingleUserByID(parseInt(id, 10));
   if (!user || !id) res.status(404).json({ msg: "User is not found", status: false });
+  checkPermissions(req.user!, user!.id);
+  res.status(200).json({ data: user, status: true });
+};
+
+export const getUserByEmail = async (req: Request, res: Response) => {
+  const { email } = req.params;
+  const user = await getSingleUserByEmail(email);
+  if (!user || !email) res.status(404).json({ msg: "User is not found", status: false });
   checkPermissions(req.user!, user!.id);
   res.status(200).json({ data: user, status: true });
 };
