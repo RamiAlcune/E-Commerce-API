@@ -12,12 +12,22 @@ export interface UserI extends RowDataPacket {
   role: string;
   isVerified?: boolean;
   verifcationToken: string;
+  password_token_expiration?: Date;
+  password_token?: string;
+  password_token_code?: number;
 }
 
 export interface ReqUserI {
   id: number;
   username?: string;
   role?: string;
+}
+
+export interface ForgetPassword {
+  password_token_expiration: Date | null;
+  password_token: string | null;
+  password_token_code: number | null;
+  password?: string;
 }
 
 export interface UserReqI {
@@ -30,6 +40,9 @@ export interface UserReqI {
   verification_link?: string;
   isVerified?: boolean;
   verified?: Date;
+  password_token?: string;
+  password_token_code?: number;
+  password_token_expiration?: Date;
 }
 
 export interface UserFindAndUpdate {
@@ -128,6 +141,12 @@ export const UpdateUserByID = async (id: any, UpdatedData: Partial<UserFindAndUp
   const [result] = await connection.query<ResultSetHeader>(`UPDATE users SET ? WHERE id = ?`, [UpdatedData, id]);
   if (!result) return null;
   return result;
+};
+
+export const AddForgetPasswordToken = async (UpdatedData: Partial<ForgetPassword>, email: string): Promise<number | null> => {
+  const [result] = await connection.query<ResultSetHeader>(`UPDATE users SET ? WHERE email = ?`, [UpdatedData, email]);
+  if (!result) return null;
+  return result.affectedRows as number;
 };
 
 export const changeCurrentPassword = async (id: any, newPassword: string): Promise<ResultSetHeader | null> => {

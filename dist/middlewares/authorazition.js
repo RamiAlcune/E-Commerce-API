@@ -4,20 +4,24 @@ exports.authorizePermissions = exports.authenticateUser = void 0;
 const jwt_1 = require("../utils/jwt");
 const unauthenticated_1 = require("../errors/unauthenticated");
 const unauthorized_1 = require("../errors/unauthorized");
+const tokenModel_1 = require("../models/tokenModel");
+const jwt_2 = require("../utils/jwt");
 const authenticateUser = async (req, res, next) => {
-    const token = req.signedCookies.token;
-    console.log(token);
-    if (!token)
-        throw new unauthenticated_1.UnauthenticatedError("Authentication Error");
+    const { refreshToken, accsesToken } = req.signedCookies;
     try {
-        const decoded = (0, jwt_1.isTokenValid)(token);
-        if (!decoded) {
-            res.status(401).json({ msg: "Authentication Error: Invalid token" });
-            return;
+        if (accsesToken) {
+            const payload = (0, jwt_1.isTokenValid)(accsesToken);
+            req.user = payload;
+            return next();
         }
-        const { username, id, role } = decoded;
-        console.log(`authenticateUser: ${id}`);
-        req.user = { username, id, role };
+        //Refresh Token
+        const payload = (0, jwt_1.isTokenValid)(refreshToken);
+        const existingToken = await (0, tokenModel_1.getTokenByUserID)(payload.id, refreshToken);
+        if (!existingToken || !existingToken?.isValid) {
+            throw new unauthenticated_1.UnauthenticatedError("Authentication Invalid");
+        }
+        (0, jwt_2.attachCookiesResponse)({ res, user: payload.id, refresh_token: existingToken.refresh_token });
+        req.user = payload;
         next();
     }
     catch (error) {

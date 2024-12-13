@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.changeCurrentPassword = exports.UpdateUserByID = exports.verifyTheUser = exports.getSingleUserByEmail = exports.getSingleUserByID = exports.getUsers = exports.createUser = exports.getUserByUserName = void 0;
+exports.changeCurrentPassword = exports.AddForgetPasswordToken = exports.UpdateUserByID = exports.verifyTheUser = exports.getSingleUserByEmail = exports.getSingleUserByID = exports.getUsers = exports.createUser = exports.getUserByUserName = void 0;
 const database_1 = __importDefault(require("../database"));
 const validator_1 = __importDefault(require("validator"));
 const getUserByUserName = async (username) => {
@@ -75,6 +75,13 @@ const UpdateUserByID = async (id, UpdatedData) => {
     return result;
 };
 exports.UpdateUserByID = UpdateUserByID;
+const AddForgetPasswordToken = async (UpdatedData, email) => {
+    const [result] = await database_1.default.query(`UPDATE users SET ? WHERE email = ?`, [UpdatedData, email]);
+    if (!result)
+        return null;
+    return result.affectedRows;
+};
+exports.AddForgetPasswordToken = AddForgetPasswordToken;
 const changeCurrentPassword = async (id, newPassword) => {
     try {
         const [updateRow] = await database_1.default.query("UPDATE users SET password = ? WHERE id = ?", [newPassword, id]);

@@ -3,23 +3,28 @@ import { isTokenValid } from "../utils/jwt";
 import { UnauthenticatedError } from "../errors/unauthenticated";
 import { ReqUserI } from "../models/UsersModel";
 import { UnauthentizedError } from "../errors/unauthorized";
+import { getTokenByUserID } from "../models/tokenModel";
+import { attachCookiesResponse } from "../utils/jwt";
 export interface CustomRequestForUserReq extends Request {
   user: ReqUserI; // For single user
 }
 
 export const authenticateUser = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-  const token = req.signedCookies.token;
-  console.log(token);
-  if (!token) throw new UnauthenticatedError("Authentication Error");
+  const { refreshToken, accsesToken } = req.signedCookies;
   try {
-    const decoded = isTokenValid(token);
-    if (!decoded) {
-      res.status(401).json({ msg: "Authentication Error: Invalid token" });
-      return;
+    if (accsesToken) {
+      const payload = isTokenValid(accsesToken);
+      req.user = payload;
+      return next();
     }
-    const { username, id, role } = decoded;
-    console.log(`authenticateUser: ${id}`);
-    req.user = { username, id, role };
+    //Refresh Token
+    const payload = isTokenValid(refreshToken);
+    const existingToken = await getTokenByUserID(payload.id, refreshToken);
+    if (!existingToken || !existingToken?.isValid) {
+      throw new UnauthenticatedError("Authentication Invalid");
+    }
+    attachCookiesResponse({ res, user: payload.id, refresh_token: existingToken.refresh_token });
+    req.user = payload;
     next();
   } catch (error) {
     throw new UnauthenticatedError("Authentication Invalid");

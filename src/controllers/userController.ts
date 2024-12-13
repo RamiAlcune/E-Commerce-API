@@ -57,7 +57,6 @@ export const updateUser = async (req: Request, res: Response): Promise<void> => 
     return;
   }
   const TokenUser = createTokenUser(userUpdated);
-  await attachCookiesResponse({ res, user: TokenUser });
   res.status(201).json({ msg: "User information has been successfully updated.", data: TokenUser, status: true });
 };
 

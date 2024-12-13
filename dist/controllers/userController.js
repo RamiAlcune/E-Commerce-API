@@ -9,7 +9,6 @@ const UsersModel_1 = require("../models/UsersModel");
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const bad_request_1 = require("../errors/bad-request");
 const createTokenUser_1 = require("../utils/createTokenUser");
-const jwt_1 = require("../utils/jwt");
 const unauthenticated_1 = require("../errors/unauthenticated");
 const checkPermissions_1 = require("../utils/checkPermissions");
 const getAllUsers = async (req, res) => {
@@ -62,7 +61,6 @@ const updateUser = async (req, res) => {
         return;
     }
     const TokenUser = (0, createTokenUser_1.createTokenUser)(userUpdated);
-    await (0, jwt_1.attachCookiesResponse)({ res, user: TokenUser });
     res.status(201).json({ msg: "User information has been successfully updated.", data: TokenUser, status: true });
 };
 exports.updateUser = updateUser;
