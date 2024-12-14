@@ -82,7 +82,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
   //check for existing Token
   refresh_token = crypto.randomBytes(40).toString("hex");
   const user_agent = req.headers["user-agent"] as string;
-  const ip = req.ip as string;
+  const ip = (req.headers["x-forwarded-for"] as string) || (req.socket.remoteAddress as string);
   const userToken: TokenI = { refresh_token, ip, user_agent, id_user: userExist.id };
   const token = await createToken(userToken);
   await attachCookiesResponse({ res, user: UserReq, refresh_token });
