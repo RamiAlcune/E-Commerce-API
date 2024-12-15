@@ -43,17 +43,21 @@ export const register = async (req: Request, res: Response): Promise<void> => {
 
 export const login = async (req: Request, res: Response): Promise<void> => {
   const userInfo = req.body;
-  if (!userInfo.username || !userInfo.password || !userInfo.email) {
+  if ((!userInfo.username && !userInfo.email) || !userInfo.password) {
     res.status(200).json({ msg: "All fields are required.", status: false });
     return;
   }
 
-  const userExist = await getUserByUserName(userInfo.username);
+  const validUserOrEmail = userInfo.email || userInfo.username;
+
+  const userExist = await getUserByUserName(validUserOrEmail);
   if (!userExist) {
     res.status(200).json({ msg: "This account is not registered.", status: false });
     return;
   }
-
+  if (userExist.username !== validUserOrEmail && userExist.email !== validUserOrEmail) {
+    res.status(200).json({ msg: "username or email are not valid!", status: false });
+  }
   const isPasswordValid = await bcrypt.compare(userInfo.password, userExist.password);
 
   if (!isPasswordValid) {
@@ -76,7 +80,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     }
     refresh_token = existingToken.refresh_token;
     await attachCookiesResponse({ res, user: UserReq, refresh_token });
-    res.status(200).json({ user: UserReq });
+    res.status(200).json({ msg: "You have successfully logged in.", status: true });
     return;
   }
   //check for existing Token

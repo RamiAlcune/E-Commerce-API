@@ -45,14 +45,18 @@ const register = async (req, res) => {
 exports.register = register;
 const login = async (req, res) => {
     const userInfo = req.body;
-    if (!userInfo.username || !userInfo.password || !userInfo.email) {
+    if ((!userInfo.username && !userInfo.email) || !userInfo.password) {
         res.status(200).json({ msg: "All fields are required.", status: false });
         return;
     }
-    const userExist = await (0, UsersModel_1.getUserByUserName)(userInfo.username);
+    const validUserOrEmail = userInfo.email || userInfo.username;
+    const userExist = await (0, UsersModel_1.getUserByUserName)(validUserOrEmail);
     if (!userExist) {
         res.status(200).json({ msg: "This account is not registered.", status: false });
         return;
+    }
+    if (userExist.username !== validUserOrEmail && userExist.email !== validUserOrEmail) {
+        res.status(200).json({ msg: "username or email are not valid!", status: false });
     }
     const isPasswordValid = await bcryptjs_1.default.compare(userInfo.password, userExist.password);
     if (!isPasswordValid) {
@@ -74,13 +78,13 @@ const login = async (req, res) => {
         }
         refresh_token = existingToken.refresh_token;
         await (0, jwt_1.attachCookiesResponse)({ res, user: UserReq, refresh_token });
-        res.status(200).json({ user: UserReq });
+        res.status(200).json({ msg: "You have successfully logged in.", status: true });
         return;
     }
     //check for existing Token
     refresh_token = crypto_1.default.randomBytes(40).toString("hex");
     const user_agent = req.headers["user-agent"];
-    const ip = req.ip;
+    const ip = req.headers["x-forwarded-for"]?.split(",")[0].trim() || req.socket.remoteAddress;
     const userToken = { refresh_token, ip, user_agent, id_user: userExist.id };
     const token = await (0, tokenModel_1.createToken)(userToken);
     await (0, jwt_1.attachCookiesResponse)({ res, user: UserReq, refresh_token });

@@ -63,7 +63,7 @@ export interface UserInput {
   verificationCode: number;
 }
 export const getUserByUserName = async (username: string): Promise<UserI | null> => {
-  const [rows] = await connection.query<UserI[]>("SELECT * FROM users WHERE username = ?", [username]);
+  const [rows] = await connection.query<UserI[]>("SELECT * FROM users WHERE username = ? OR email = ?", [username, username]);
   return rows[0] || null;
 };
 

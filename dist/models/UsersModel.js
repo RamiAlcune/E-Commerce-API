@@ -7,7 +7,7 @@ exports.changeCurrentPassword = exports.AddForgetPasswordToken = exports.UpdateU
 const database_1 = __importDefault(require("../database"));
 const validator_1 = __importDefault(require("validator"));
 const getUserByUserName = async (username) => {
-    const [rows] = await database_1.default.query("SELECT * FROM users WHERE username = ?", [username]);
+    const [rows] = await database_1.default.query("SELECT * FROM users WHERE username = ? OR email = ?", [username, username]);
     return rows[0] || null;
 };
 exports.getUserByUserName = getUserByUserName;
