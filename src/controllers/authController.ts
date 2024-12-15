@@ -42,23 +42,21 @@ export const register = async (req: Request, res: Response): Promise<void> => {
 };
 
 export const login = async (req: Request, res: Response): Promise<void> => {
-  const userInfo = req.body;
-  if ((!userInfo.username && !userInfo.email) || !userInfo.password) {
+  const { password, userOrEmail } = req.body;
+  if (!userOrEmail || !password) {
     res.status(200).json({ msg: "All fields are required.", status: false });
     return;
   }
 
-  const validUserOrEmail = userInfo.email || userInfo.username;
-
-  const userExist = await getUserByUserName(validUserOrEmail);
+  const userExist = await getUserByUserName(userOrEmail);
   if (!userExist) {
     res.status(200).json({ msg: "This account is not registered.", status: false });
     return;
   }
-  if (userExist.username !== validUserOrEmail && userExist.email !== validUserOrEmail) {
+  if (userExist.username !== userOrEmail && userExist.email !== userOrEmail) {
     res.status(200).json({ msg: "username or email are not valid!", status: false });
   }
-  const isPasswordValid = await bcrypt.compare(userInfo.password, userExist.password);
+  const isPasswordValid = await bcrypt.compare(password, userExist.password);
 
   if (!isPasswordValid) {
     res.status(200).json({ msg: "The password you entered is incorrect. Please verify and try again.", status: false });
