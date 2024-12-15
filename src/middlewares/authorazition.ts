@@ -14,7 +14,9 @@ export const authenticateUser = async (req: Request, res: Response, next: NextFu
   try {
     if (accsesToken) {
       const payload = isTokenValid(accsesToken);
+      console.log(`payload: ${payload}`);
       req.user = payload;
+      console.log(req.user);
       return next();
     }
     //Refresh Token
@@ -25,6 +27,7 @@ export const authenticateUser = async (req: Request, res: Response, next: NextFu
     }
     attachCookiesResponse({ res, user: payload.id, refresh_token: existingToken.refresh_token });
     req.user = payload;
+    console.log(req.user);
     next();
   } catch (error) {
     throw new UnauthenticatedError("Authentication Invalid");

@@ -11,7 +11,9 @@ const authenticateUser = async (req, res, next) => {
     try {
         if (accsesToken) {
             const payload = (0, jwt_1.isTokenValid)(accsesToken);
+            console.log(`payload: ${payload}`);
             req.user = payload;
+            console.log(req.user);
             return next();
         }
         //Refresh Token
@@ -22,6 +24,7 @@ const authenticateUser = async (req, res, next) => {
         }
         (0, jwt_2.attachCookiesResponse)({ res, user: payload.id, refresh_token: existingToken.refresh_token });
         req.user = payload;
+        console.log(req.user);
         next();
     }
     catch (error) {

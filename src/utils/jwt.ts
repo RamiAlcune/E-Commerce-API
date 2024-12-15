@@ -20,7 +20,7 @@ export const isTokenValid = (token: string): UserReqI => {
 };
 
 export const attachCookiesResponse = async ({ res, user, refresh_token }: { res: Response; user: any; refresh_token: any }) => {
-  const accsesTokenJWT = await generateToken({ payload: { user } });
+  const accsesTokenJWT = await generateToken({ payload: user });
   const refreshTokenJWT = await generateToken({ payload: { user, refresh_token } });
   const oneDay = 1000 * 60 * 60 * 24;
   const longerDate = 1000 * 60 * 60 * 24 * 24 * 30;

@@ -1,10 +1,10 @@
-import express from "express";
+import express, { RequestHandler } from "express";
 import { createProduct, deleteProduct, getAllProducts, getSingleProduct, updateProduct, uploadImage, getSingleProductReviews } from "../controllers/productController";
 import { authenticateUser, authorizePermissions } from "../middlewares/authorazition";
 const ProductRouter = express.Router();
 
 //Authenticate User is Alawys used:
-ProductRouter.use(authenticateUser);
+ProductRouter.use(authenticateUser as RequestHandler);
 
 //GET
 ProductRouter.get("/", getAllProducts);
