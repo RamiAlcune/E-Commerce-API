@@ -11,11 +11,11 @@ ProductRouter.get("/", getAllProducts);
 ProductRouter.get("/:id", getSingleProduct);
 ProductRouter.get("/:id/reviews", getSingleProductReviews);
 //POST
-ProductRouter.post("/createProduct", authorizePermissions("user", "admin"), createProduct);
+ProductRouter.post("/createProduct", authorizePermissions("user"), createProduct);
 //UploadImage
-ProductRouter.post("/uploadImage", authorizePermissions("user", "admin"), uploadImage);
+ProductRouter.post("/uploadImage", authorizePermissions("user"), uploadImage);
 //PATCH
-ProductRouter.patch("/:id", authorizePermissions("user", "admin"), updateProduct);
+ProductRouter.patch("/:id", authorizePermissions("user"), updateProduct);
 //DELETE
-ProductRouter.delete("/:id", authorizePermissions("user", "admin"), deleteProduct);
+ProductRouter.delete("/:id", authorizePermissions("user"), deleteProduct);
 export default ProductRouter;
