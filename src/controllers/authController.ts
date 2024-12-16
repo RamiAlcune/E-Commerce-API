@@ -93,10 +93,14 @@ export const login = async (req: Request, res: Response): Promise<void> => {
 };
 
 export const logout = async (req: Request, res: Response): Promise<void> => {
-  await deleteToken(req.user.id);
+  // Invalidate the cookies
   res.cookie("accsesToken", "logout", { httpOnly: true, expires: new Date(Date.now()) });
   res.cookie("refreshToken", "logout", { httpOnly: true, expires: new Date(Date.now()) });
-  res.status(200).json({ msg: "user logged out!", status: true });
+
+  // Perform logout actions
+  await deleteToken(req.user.id);
+  // Send a successful logout response
+  res.status(200).json({ msg: "User logged out!", status: true });
 };
 
 export const verifyEmail = async (req: Request, res: Response) => {
@@ -197,5 +201,14 @@ export const resetPassword = async (req: Request, res: Response) => {
       // Handle unknown error types
       res.status(200).json({ msg: "An unknown error occurred", status: false });
     }
+  }
+};
+
+export const isCookiesHere = async (req: Request, res: Response) => {
+  if (!req.signedCookies.accsesToken || !req.signedCookies.refreshToken) {
+    res.status(200).json({ msg: "You are already logged out!", status: true });
+    return;
+  } else {
+    res.status(200).json({ msg: "Cookies are still available.", status: false });
   }
 };

@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.resetPassword = exports.forgetPassword = exports.verifyEmail = exports.logout = exports.login = exports.register = void 0;
+exports.isCookiesHere = exports.resetPassword = exports.forgetPassword = exports.verifyEmail = exports.logout = exports.login = exports.register = void 0;
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const UsersModel_1 = require("../models/UsersModel");
 const jwt_1 = require("../utils/jwt");
@@ -91,10 +91,13 @@ const login = async (req, res) => {
 };
 exports.login = login;
 const logout = async (req, res) => {
-    await (0, tokenModel_1.deleteToken)(req.user.id);
+    // Invalidate the cookies
     res.cookie("accsesToken", "logout", { httpOnly: true, expires: new Date(Date.now()) });
     res.cookie("refreshToken", "logout", { httpOnly: true, expires: new Date(Date.now()) });
-    res.status(200).json({ msg: "user logged out!", status: true });
+    // Perform logout actions
+    await (0, tokenModel_1.deleteToken)(req.user.id);
+    // Send a successful logout response
+    res.status(200).json({ msg: "User logged out!", status: true });
 };
 exports.logout = logout;
 const verifyEmail = async (req, res) => {
@@ -196,3 +199,13 @@ const resetPassword = async (req, res) => {
     }
 };
 exports.resetPassword = resetPassword;
+const isCookiesHere = async (req, res) => {
+    if (!req.signedCookies.accsesToken || !req.signedCookies.refreshToken) {
+        res.status(200).json({ msg: "You are already logged out!", status: true });
+        return;
+    }
+    else {
+        res.status(200).json({ msg: "Cookies are still available.", status: false });
+    }
+};
+exports.isCookiesHere = isCookiesHere;

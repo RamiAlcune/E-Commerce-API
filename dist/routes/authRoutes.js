@@ -13,4 +13,5 @@ AuthRoutes.post("/login", authController_1.login);
 AuthRoutes.delete("/logout", authorazition_1.authenticateUser, authController_1.logout);
 AuthRoutes.post("/forget-password", authController_1.forgetPassword);
 AuthRoutes.post("/reset-password", authController_1.resetPassword);
+AuthRoutes.get("/is-cookies-available", authController_1.isCookiesHere);
 exports.default = AuthRoutes;
