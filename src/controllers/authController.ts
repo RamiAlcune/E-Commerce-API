@@ -204,11 +204,11 @@ export const resetPassword = async (req: Request, res: Response) => {
   }
 };
 
-export const isCookiesHere = async (req: Request, res: Response) => {
+export const cookieStatus = async (req: Request, res: Response) => {
   if (!req.signedCookies.accsesToken || !req.signedCookies.refreshToken) {
-    res.status(200).json({ msg: "You are already logged out!", status: true });
+    res.status(200).json({ msg: "The Cookies are not available", status: false });
     return;
   } else {
-    res.status(200).json({ msg: "Cookies are still available.", status: false });
+    res.status(200).json({ msg: "Cookies are available", status: true });
   }
 };

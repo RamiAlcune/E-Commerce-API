@@ -23,7 +23,7 @@ export const attachCookiesResponse = async ({ res, user, refresh_token }: { res:
   const accsesTokenJWT = await generateToken({ payload: user });
   const refreshTokenJWT = await generateToken({ payload: { user, refresh_token } });
   const oneDay = 1000 * 60 * 60 * 24;
-  const longerDate = 1000 * 60 * 60 * 24 * 24 * 30;
+  const longerDate = 1000 * 60 * 60 * 24 * 7;
 
   res.cookie("accsesToken", accsesTokenJWT, {
     httpOnly: true,
