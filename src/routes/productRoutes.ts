@@ -3,19 +3,17 @@ import { createProduct, deleteProduct, getAllProducts, getSingleProduct, updateP
 import { authenticateUser, authorizePermissions } from "../middlewares/authorazition";
 const ProductRouter = express.Router();
 
-//Authenticate User is Alawys used:
-ProductRouter.use(authenticateUser as RequestHandler);
 
 //GET
 ProductRouter.get("/", getAllProducts);
 ProductRouter.get("/:id", getSingleProduct);
 ProductRouter.get("/:id/reviews", getSingleProductReviews);
 //POST
-ProductRouter.post("/createProduct", authorizePermissions("user"), createProduct);
+ProductRouter.post("/createProduct", authenticateUser as RequestHandler,authorizePermissions("user"), createProduct);
 //UploadImage
-ProductRouter.post("/uploadImage", authorizePermissions("user"), uploadImage);
+ProductRouter.post("/uploadImage", authenticateUser as RequestHandler,authorizePermissions("user"), uploadImage);
 //PATCH
-ProductRouter.patch("/:id", authorizePermissions("user"), updateProduct);
+ProductRouter.patch("/:id", authenticateUser as RequestHandler,authorizePermissions("user"), updateProduct);
 //DELETE
-ProductRouter.delete("/:id", authorizePermissions("user"), deleteProduct);
+ProductRouter.delete("/:id", authenticateUser as RequestHandler,authorizePermissions("user"), deleteProduct);
 export default ProductRouter;

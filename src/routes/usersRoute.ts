@@ -11,7 +11,7 @@ import {
 const UsersRoute = express.Router();
 
 // Route for getting all users
-UsersRoute.get("/", authenticateUser as RequestHandler, authorizePermissions("user", "admin"), getAllUsers);
+UsersRoute.get("/", getAllUsers);
 UsersRoute.patch("/UpdateUser", authenticateUser as RequestHandler, authorizePermissions("user", "admin"), updateUser);
 // Route for showing the current user
 UsersRoute.get("/showMe", authenticateUser as RequestHandler, showCurrentUser);
